@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left" data-drop="move">
+            <div data-state="copy" style="background: blue;" draggable="true" class="classify">数学</div>
+            <div data-state="copy" style="background: green;" draggable="true" class="classify">英语</div>
+
+        </div>
+        <div class="right">
+            <table>
+                <caption>课程表</caption>
+                <thead>
+                    <th>星期1</th>
+                    <th>星期2</th>
+                    <th>星期3</th>
+                    <th>星期4</th>
+                    <th>星期5</th>
+                    <th>星期6</th>
+                    <th>星期7</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                    </tr>
+                    <tr>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                    </tr>
+                    <tr>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                    </tr>
+                    <tr>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                        <td data-drop="copy"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="add-classify"><input type="text" placeholder="请输入课程">
+        <button>添加课程</button>
+    </div>
+    <script>
+
+        window.addEventListener("selectstart", (e) => e.preventDefault())
+        const container = document.querySelector(".container")
+        let source = null
+        container.addEventListener("dragstart", (e) => {
+            e.dataTransfer.effectAllowed = e.target.dataset.state
+            source = e.target
+        })
+        container.addEventListener("dragover", (e) => {
+            e.preventDefault()
+        })
+        container.addEventListener("dragenter", (e) => {
+            const conMoveCopy = deepParentNode(e.target)
+            if (!conMoveCopy) return
+            document.querySelector(".can-move")?.classList.remove("can-move")
+            conMoveCopy.classList.add("can-move")
+
+        })
+
+        container.addEventListener("drop", (e) => {
+            document.querySelector(".can-move")?.classList.remove("can-move")
+            const conMoveCopy = deepParentNode(e.target)
+            if (!conMoveCopy) return
+
+            if (source.dataset.state == "copy" && conMoveCopy.dataset.drop == "copy") {
+                const cloneNode = source.cloneNode(true)
+                cloneNode.dataset.state = "move"
+                conMoveCopy.innerHTML = ""
+                conMoveCopy.append(cloneNode)
+            }
+            if (source.dataset.state == "move" && conMoveCopy.dataset.drop == "copy") {
+                conMoveCopy.innerHTML = ""
+                conMoveCopy.append(source)
+            }
+            if (source.dataset.state == "copy" && conMoveCopy.dataset.drop == "move") {
+                return
+            }
+            if (source.dataset.state == "move" && conMoveCopy.dataset.drop == "move") {
+                source.remove()
+            }
+        })
+
+        function deepParentNode(node) {
+            while (node) {
+                if (node.dataset && node.dataset.drop) {
+                    return node
+                }
+                node = node.parentNode
+            }
+        }
+
+        const btn = document.querySelector("button")
+        btn.addEventListener("click", (e) => {
+            const target = e.target
+
+            const input = document.querySelector("input")
+            const left = document.querySelector(".left")
+            if (input.value.trim().length) {
+                const div = document.createElement("div")
+                div.style.background = dandomColor()
+                div.innerText = input.value
+                div.classList.add("classify")
+                div.dataset.state = "copy"
+                div.draggable = true
+                left.append(div)
+                input.value=""
+            }
+        })
+        function dandomColor() {
+            return "#" + Math.random().toString(16).substring(2, 8)
+        }
+
+
+    </script>
+</body>
+
+</html>
